@@ -1,0 +1,11 @@
+# File created by luuv TSX
+# Created on: Thu Jan 21 10:42:53 2010 -1
+
+newmtl RoadKillOut
+Ns 0
+Ka 0.290000 0.290000 0.290000
+Kd 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+d 0.996078
+map_Kd sharktexture.bmp 
+# End

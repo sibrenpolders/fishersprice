@@ -1,0 +1,12 @@
+# File created by luuv TSX
+# Created on: Wed Dec 09 11:47:27 2009 -1
+
+newmtl moray_eel
+Ns 0
+Ka 0.410000 0.410000 0.410000
+Kd 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+d 0.996078
+map_bump morayeel_textureNM.bmp 
+map_Kd morayeel_texture.bmp 
+# End
