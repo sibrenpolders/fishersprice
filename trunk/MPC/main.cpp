@@ -5,6 +5,8 @@
 #include "LocationTracker.h"
 #include "FishManager.h"
 #include "usb_controller.h"
+#include "KeyEventReceiver.h"
+#include "Cross.h"
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -64,27 +66,30 @@ void printUSBControllerValues(USB_Controller* usbController) {
 }
 
 int main() {
-	USB_Controller usbController("/dev/ttyUSB0");
+	//USB_Controller usbController("/dev/ttyUSB0");
 	LocationTracker locationTracker;
 	locationTracker.setScreenDimensions(800, 600);
 
-	sleep(10);
-	calibrate(&usbController, &locationTracker);
+	//sleep(10);
+	//calibrate(&usbController, &locationTracker);
 
 	//Using opengl, Screen size 800, 600, 32 bit, fullscreen = false, stencilbuffer = true, vsync = false
 	IrrlichtDevice *device = createDevice(EDT_OPENGL, core::dimension2d<u32>(
-			800, 600), 16, false, true, false);
+			1280, 800), 16, true, true, false);
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 
+	KeyEventReceiver receiver;
 	SceneManager sceneMan(device, driver, smgr);
 	ICameraSceneNode * camera = sceneMan.init();
-
+	Cross cross(driver, smgr, sceneMan.getTerrainSelector());
 	FishManager fishMan(device, driver, smgr);
+
 	fishMan.addFish(SHARK, vector3df(5725.f, 75.f, 5655.f), vector3df(3635.f,
 			75.f, 6235.f), 15000);
 	fishMan.addFish(CLOWN, vector3df(3387.f, 75.f, 6024.f), vector3df(4350.f,
 			75.f, 3750.f), 35000);
+	device->setEventReceiver(&receiver);
 
 	/////////////////////////////////////////////////////////////////////////
 	//                             Main loop
@@ -94,33 +99,38 @@ int main() {
 	u32 now = device->getTimer()->getTime();
 	int loopNr = 0;
 
-	while (device->run())
+	while (device->run() && !receiver.getStopApp())
 		if (device->isWindowActive()) {
 			now = device->getTimer()->getTime();
 			unsigned int lastFrameDurationMilliSeconds = now - then;
 			then = now;
 
-			usbController.update();
-			printUSBControllerValues(&usbController);
-			int values[3];
-			locationTracker.insertNewValues(values, now);
-			if (locationTracker.newThrowReady()) {
-				unsigned int interval =
-						locationTracker.getTimeIntervalOfThrow();
-				float distance = locationTracker.getDistanceIntervalOfThrow();
-				int* posInPlane = locationTracker.getPositionInPlane(values);
-				int horX = camera->getAbsolutePosition().X;
-				int horY = camera->getAbsolutePosition().Y;
+			/*usbController.update();
+			 printUSBControllerValues(&usbController);
+			 int values[3];
+			 locationTracker.insertNewValues(values, now);
+			 if (locationTracker.newThrowReady()) {
+			 unsigned int interval =
+			 locationTracker.getTimeIntervalOfThrow();
+			 float distance = locationTracker.getDistanceIntervalOfThrow();
+			 int* posInPlane = locationTracker.getPositionInPlane(values);
+			 int horX = camera->getAbsolutePosition().X;
+			 int horY = camera->getAbsolutePosition().Y;
 
-				//	int* droppedPoint = lineThrower.throwLine(distance, interval,
-				//		posinPlane, horX, horY);
-				//	drawCross(droppedPoint);
-			}
+			 //	int* droppedPoint = lineThrower.throwLine(distance, interval,
+			 //		posinPlane, horX, horY);
+			 //	drawCross(droppedPoint);
+			 }*/
 
 			loopNr++;
-			if (loopNr > 20) {
+			if (loopNr == 35) {
+				//usbController.buzz(100);
+				cross.swimAway(30);
+			}
+			if (loopNr > 100) {
 				loopNr = 0;
 				//usbController.buzz(100);
+				cross.bringIn(25);
 			}
 
 			fishMan.update(lastFrameDurationMilliSeconds);
