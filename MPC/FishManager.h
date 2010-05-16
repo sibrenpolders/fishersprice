@@ -17,6 +17,7 @@ typedef enum TYPE_FISH {
 
 typedef struct FishInfo {
 	TYPE_FISH type;
+	short ID;
 	vector3df start;
 	vector3df stop;
 	vector3df currPos;
@@ -24,6 +25,8 @@ typedef struct FishInfo {
 	int currMilliSecsPassed;
 	bool fromStartToStop;
 	IAnimatedMeshSceneNode* node;
+	bool isHooked;
+	vector3df direction;
 } FishInfo;
 
 class FishManager {
@@ -39,6 +42,7 @@ private:
 	IrrlichtDevice * m_device;
 	IVideoDriver* m_driver;
 	ISceneManager* m_smgr;
+	short m_nextID;
 
 	vector<FishInfo*> m_fishes;
 

@@ -5,6 +5,7 @@ FishManager::FishManager(IrrlichtDevice *device, IVideoDriver* driver,
 	this->m_device = device;
 	this->m_driver = driver;
 	this->m_smgr = smgr;
+	m_nextID = 0;
 }
 
 FishManager::~FishManager() {
@@ -13,32 +14,37 @@ FishManager::~FishManager() {
 void FishManager::update(unsigned long millisecs) {
 	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
 		FishInfo* info = m_fishes[i];
-
-		// Check if the fish must return
-		if (info->currMilliSecsPassed + millisecs >= info->duration) {
-			if (info->fromStartToStop) {
-				info->fromStartToStop = false;
-				info->currMilliSecsPassed = 0;
-				info->node->setRotation(vector3df(0.0, 180.0, 0.0));
-			} else {
-				info->fromStartToStop = true;
-				info->currMilliSecsPassed = 0;
-				info->node->setRotation(vector3df(0.0, 0.0, 0.0));
+		if (!info->isHooked) {
+			// Check if the fish must return
+			if (info->currMilliSecsPassed + millisecs >= info->duration) {
+				if (info->fromStartToStop) {
+					info->fromStartToStop = false;
+					info->direction = info->start;
+					info->currMilliSecsPassed = 0;
+					info->node->setRotation(vector3df(0.0, 180.0, 0.0));
+				} else {
+					info->fromStartToStop = true;
+					info->direction = info->stop;
+					info->currMilliSecsPassed = 0;
+					info->node->setRotation(vector3df(0.0, 0.0, 0.0));
+				}
 			}
-		}
 
-		// Update the position
-		info->currMilliSecsPassed += millisecs;
-		float ratio = ((float) info->currMilliSecsPassed) / info->duration;
+			// Update the position
+			info->currMilliSecsPassed += millisecs;
+			float ratio = ((float) info->currMilliSecsPassed) / info->duration;
 
-		if (info->fromStartToStop) {
-			vector3df curr = info->start + ratio * (info->stop - info->start);
-			info->currPos = curr;
-			info->node->setPosition(curr);
-		} else {
-			vector3df curr = info->stop + ratio * (info->start - info->stop);
-			info->currPos = curr;
-			info->node->setPosition(curr);
+			if (info->fromStartToStop) {
+				vector3df curr = info->start + ratio * (info->stop
+						- info->start);
+				info->currPos = curr;
+				info->node->setPosition(curr);
+			} else {
+				vector3df curr = info->stop + ratio
+						* (info->start - info->stop);
+				info->currPos = curr;
+				info->node->setPosition(curr);
+			}
 		}
 	}
 }
@@ -69,6 +75,9 @@ void FishManager::addFish(TYPE_FISH fish, vector3df startPos, vector3df endPos,
 		newInfo->type = fish;
 		newInfo->currMilliSecsPassed = 0;
 		newInfo->fromStartToStop = true;
+		newInfo->ID = m_nextID++;
+		newInfo->isHooked = false;
+		newInfo->direction = endPos;
 
 		m_fishes.push_back(newInfo);
 	}

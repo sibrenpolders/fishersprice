@@ -78,17 +78,15 @@ void SceneManager::loadTerrain() {
 	buffer->drop();
 
 	// create triangle selector for the terrain
-	scene::ITriangleSelector* selector = m_smgr->createTerrainTriangleSelector(
-			terrain, 0);
-	terrain->setTriangleSelector(selector);
+	m_terrainSelector = m_smgr->createTerrainTriangleSelector(terrain, 0);
+	terrain->setTriangleSelector(m_terrainSelector);
 
 	// create collision response animator and attach it to the camera
-	/*scene::ISceneNodeAnimator* anim = m_smgr->createCollisionResponseAnimator(
-			selector, m_camera, core::vector3df(60, 100, 60), core::vector3df(
-					0, 0, 0), core::vector3df(0, 50, 0));
-	selector->drop();
+	scene::ISceneNodeAnimator* anim = m_smgr->createCollisionResponseAnimator(
+			m_terrainSelector, m_camera, core::vector3df(60, 100, 60),
+			core::vector3df(0, -20.f, 0), core::vector3df(0, 50, 0));
 	m_camera->addAnimator(anim);
-	anim->drop();*/
+	anim->drop();
 }
 
 void SceneManager::loadSky() {

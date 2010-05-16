@@ -16,6 +16,9 @@ public:
 			ISceneManager* smgr);
 	virtual ~SceneManager();
 	ICameraSceneNode * init();
+	scene::ITriangleSelector* getTerrainSelector() {
+		return m_terrainSelector;
+	}
 
 private:
 	void initCamera();
@@ -27,6 +30,7 @@ private:
 	IVideoDriver* m_driver;
 	ISceneManager* m_smgr;
 	ICameraSceneNode * m_camera;
+	scene::ITriangleSelector* m_terrainSelector;
 };
 
 #endif
