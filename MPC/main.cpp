@@ -67,7 +67,7 @@ void printUSBControllerValues(USB_Controller* usbController) {
 }
 
 int main() {
-	//USB_Controller usbController("/dev/ttyUSB0");
+	USB_Controller usbController("/dev/ttyUSB0");
 	LocationTracker locationTracker;
 	locationTracker.setScreenDimensions(800, 600);
 
@@ -117,26 +117,30 @@ int main() {
 			 bool pushButtonOn = usbController->push_on();
 
 			 actionMan.update(accelValues, switchOn, encoderValue,
-			 potentioValue, pushButtonOn, lastFrameDurationMilliSeconds);*/
+			 potentioValue, pushButtonOn, lastFrameDurationMilliSeconds, now);*/
 			if (actionMan.isHooked()) {
-				cout << "A fish has been hooked, bring it in !\n";
+				cout << "A fish has been hooked, bring it in!\n";
 			}
 			if (actionMan.isBroken()) {
-				cout << "Oh no, your line has broken, don't be se greedy !\n";
-				cout << "Rebegin... .\n";
+				cout << "Oh no, your line has broken, don't be so greedy!\n";
+				cout << "Rebegin/reset... .\n";
 			}
 			if (actionMan.isLandedWithFish()) {
-				cout << "Yay, the fish has been landed !";
-				cout << "Rebegin... .\n";
+				cout << "Yay, the fish has been landed!";
+				cout << "Rebegin/reset... .\n";
 			}
 			if (actionMan.isLandedWithNoFish()) {
 				cout << "No more line to bring in.\n";
-				cout << "Rebegin... .\n";
+				cout << "Rebegin/reset... .\n";
 			}
 			if (actionMan.throwBlocked()) {
-				cout << "Oh no, your line was blocked while throwing !\n";
-				cout << "Release the line before throwing ! Rebegin... .\n";
+				cout << "Oh no, your line was blocked while throwing!\n";
+				cout
+						<< "Release the line before throwing! Rebegin/reset... .\n";
 			}
+
+			if (actionMan.checkBuzz(now))
+				usbController.buzz(100);
 
 			/*cout << "CAM: " << camera->getAbsolutePosition().X << " : "
 			 << camera->getAbsolutePosition().Y << " : "

@@ -40,7 +40,6 @@ void Cross::reset() {
 void Cross::setCoords(vector3df coords) {
 	this->m_coords = coords;
 	m_cube->setPosition(m_coords);
-	setVisible(true);
 }
 
 vector3df Cross::getCoords() {
