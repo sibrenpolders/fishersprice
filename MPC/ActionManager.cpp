@@ -138,6 +138,9 @@ void ActionManager::update(int accelValues[], bool switchOn, int encoderValue,
 			coordsTo.Z = 10000; // swimming away
 			m_fishMan->setRotation(m_hookedFishID, coordsTo);
 		}
+
+		if (prevEncoderValue != encoderValue)
+			m_cross->bringIn(prevEncoderValue - encoderValue);
 	}
 }
 

@@ -108,16 +108,17 @@ int main() {
 			then = now;
 
 			// retrieve serial values
-			/*usbController.update();
+			usbController.update();
+			printUSBControllerValues(&usbController);
 			 int accelValues[3];
-			 usbController->get_accel(values);
-			 bool switchOn = usbController->switch_on();
-			 int encoderValue = usbController->get_rotation_value();
-			 int potentioValue = usbController->get_potentiometer_value();
-			 bool pushButtonOn = usbController->push_on();
+			 usbController.get_accel(accelValues);
+			 bool switchOn = usbController.switch_on();
+			 int encoderValue = usbController.get_rotation_value();
+			 int potentioValue = usbController.get_potentiometer_value();
+			 bool pushButtonOn = usbController.push_on();
 
-			 actionMan.update(accelValues, switchOn, encoderValue,
-			 potentioValue, pushButtonOn, lastFrameDurationMilliSeconds, now);*/
+			 //actionMan.update(accelValues, switchOn, encoderValue,
+			//potentioValue, pushButtonOn, lastFrameDurationMilliSeconds, now);
 			if (actionMan.isHooked()) {
 				cout << "A fish has been hooked, bring it in!\n";
 			}
