@@ -1,4 +1,6 @@
 #include "FishManager.h"
+#include <iostream>
+using namespace std;
 
 FishManager::FishManager(IrrlichtDevice *device, IVideoDriver* driver,
 		ISceneManager* smgr) {
@@ -11,6 +13,65 @@ FishManager::FishManager(IrrlichtDevice *device, IVideoDriver* driver,
 FishManager::~FishManager() {
 }
 
+void FishManager::reset() {
+	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
+		FishInfo* info = m_fishes[i];
+		info->isHooked = false;
+		info->currPos = info->start;
+		info->currMilliSecsPassed = 0;
+		info->fromStartToStop = true;
+		info->isHooked = false;
+		info->direction = info->stop;
+		info->node->setRotation(calcRotation(info->start, info->stop));
+	}
+}
+
+void FishManager::setPosition(int ID, vector3df pos) {
+	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
+		FishInfo* info = m_fishes[i];
+		if (info->ID == ID) {
+			info->currPos = pos;
+			info->node->setPosition(pos);
+		}
+	}
+}
+
+void FishManager::setRotation(int ID, vector3df towardsPoint) {
+	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
+		FishInfo* info = m_fishes[i];
+		if (info->ID == ID) {
+			vector3df curr = info->currPos;
+			info->node->setRotation(calcRotation(curr, towardsPoint));
+		}
+	}
+}
+
+void FishManager::releaseHook(int ID) {
+	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
+		FishInfo* info = m_fishes[i];
+		if (info->ID == ID) {
+			info->isHooked = false;
+			info->currPos = info->start;
+			info->currMilliSecsPassed = 0;
+			info->fromStartToStop = true;
+			info->isHooked = false;
+			info->direction = info->stop;
+			info->node->setRotation(calcRotation(info->start, info->stop));
+		}
+	}
+}
+
+int FishManager::checkForHooking(vector3df posOfHook) {
+	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
+		FishInfo* info = m_fishes[i];
+		if (info->currPos.getDistanceFrom(posOfHook) <= 50) {
+			info->isHooked = true;
+			return info->ID;
+		}
+	}
+	return -1;
+}
+
 void FishManager::update(unsigned long millisecs) {
 	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
 		FishInfo* info = m_fishes[i];
@@ -21,12 +82,14 @@ void FishManager::update(unsigned long millisecs) {
 					info->fromStartToStop = false;
 					info->direction = info->start;
 					info->currMilliSecsPassed = 0;
-					info->node->setRotation(vector3df(0.0, 180.0, 0.0));
+					info->node->setRotation(calcRotation(info->stop,
+							info->start));
 				} else {
 					info->fromStartToStop = true;
 					info->direction = info->stop;
 					info->currMilliSecsPassed = 0;
-					info->node->setRotation(vector3df(0.0, 0.0, 0.0));
+					info->node->setRotation(calcRotation(info->start,
+							info->stop));
 				}
 			}
 
@@ -78,6 +141,7 @@ void FishManager::addFish(TYPE_FISH fish, vector3df startPos, vector3df endPos,
 		newInfo->ID = m_nextID++;
 		newInfo->isHooked = false;
 		newInfo->direction = endPos;
+		newInfo->node->setRotation(calcRotation(newInfo->start, newInfo->stop));
 
 		m_fishes.push_back(newInfo);
 	}
@@ -144,5 +208,28 @@ core::vector3df FishManager::getScale(TYPE_FISH fish) {
 		break;
 	}
 	return core::vector3df(4.f, 4.f, 4.f);
-
 }
+
+vector3df FishManager::calcRotation(vector3df from, vector3df to) {
+	vector3df route = to - from;
+	route.Y = 0.f;
+	route.normalize();
+	float angle;
+	if (route.Z < 0.f) {
+		float dot = route.dotProduct(vector3df(1.f, 0.f, 0.f));
+		float angle = acos(dot);
+		angle = 1.0 * angle * (180.0 / PI) + 180.f;
+
+		return vector3df(0, angle, 0);
+	} else {
+		float dot = route.dotProduct(vector3df(1.f, 0.f, 0.f));
+		float angle = acos(dot);
+		angle = 1.0 * angle * (180.0 / PI);
+		angle = (360 - angle) + 180.f;
+
+		return vector3df(0, angle, 0);
+	}
+
+	return vector3df(0, angle, 0);
+}
+

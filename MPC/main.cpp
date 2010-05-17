@@ -4,6 +4,7 @@
 #include "SceneManager.h"
 #include "LocationTracker.h"
 #include "FishManager.h"
+#include "ActionManager.h"
 #include "usb_controller.h"
 #include "KeyEventReceiver.h"
 #include "Cross.h"
@@ -70,26 +71,27 @@ int main() {
 	LocationTracker locationTracker;
 	locationTracker.setScreenDimensions(800, 600);
 
-	//sleep(10);
-	//calibrate(&usbController, &locationTracker);
+	/*
+	 cout << "Initiating calibration... .\n";Rebegin... .\n";
+	 sleep(10);
+	 calibrate(&usbController, &locationTracker);*/
 
-	//Using opengl, Screen size 800, 600, 32 bit, fullscreen = false, stencilbuffer = true, vsync = false
 	IrrlichtDevice *device = createDevice(EDT_OPENGL, core::dimension2d<u32>(
-			1280, 800), 16, true, true, false);
+			800, 600), 16, false, true, false);
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
-
 	KeyEventReceiver receiver;
+	device->setEventReceiver(&receiver);
 	SceneManager sceneMan(device, driver, smgr);
 	ICameraSceneNode * camera = sceneMan.init();
 	Cross cross(driver, smgr, sceneMan.getTerrainSelector());
 	FishManager fishMan(device, driver, smgr);
-
 	fishMan.addFish(SHARK, vector3df(5725.f, 75.f, 5655.f), vector3df(3635.f,
 			75.f, 6235.f), 15000);
 	fishMan.addFish(CLOWN, vector3df(3387.f, 75.f, 6024.f), vector3df(4350.f,
 			75.f, 3750.f), 35000);
-	device->setEventReceiver(&receiver);
+	ActionManager actionMan(camera, &locationTracker, &cross, &fishMan);
+	receiver.setActionManager(&actionMan);
 
 	/////////////////////////////////////////////////////////////////////////
 	//                             Main loop
@@ -105,35 +107,40 @@ int main() {
 			unsigned int lastFrameDurationMilliSeconds = now - then;
 			then = now;
 
+			// retrieve serial values
 			/*usbController.update();
-			 printUSBControllerValues(&usbController);
-			 int values[3];
-			 locationTracker.insertNewValues(values, now);
-			 if (locationTracker.newThrowReady()) {
-			 unsigned int interval =
-			 locationTracker.getTimeIntervalOfThrow();
-			 float distance = locationTracker.getDistanceIntervalOfThrow();
-			 int* posInPlane = locationTracker.getPositionInPlane(values);
-			 int horX = camera->getAbsolutePosition().X;
-			 int horY = camera->getAbsolutePosition().Y;
+			 int accelValues[3];
+			 usbController->get_accel(values);
+			 bool switchOn = usbController->switch_on();
+			 int encoderValue = usbController->get_rotation_value();
+			 int potentioValue = usbController->get_potentiometer_value();
+			 bool pushButtonOn = usbController->push_on();
 
-			 //	int* droppedPoint = lineThrower.throwLine(distance, interval,
-			 //		posinPlane, horX, horY);
-			 //	drawCross(droppedPoint);
-			 }*/
-
-			loopNr++;
-			if (loopNr == 35) {
-				//usbController.buzz(100);
-				cross.swimAway(30);
+			 actionMan.update(accelValues, switchOn, encoderValue,
+			 potentioValue, pushButtonOn, lastFrameDurationMilliSeconds);*/
+			if (actionMan.isHooked()) {
+				cout << "A fish has been hooked, bring it in !\n";
 			}
-			if (loopNr > 100) {
-				loopNr = 0;
-				//usbController.buzz(100);
-				cross.bringIn(25);
+			if (actionMan.isBroken()) {
+				cout << "Oh no, your line has broken, don't be se greedy !\n";
+				cout << "Rebegin... .\n";
+			}
+			if (actionMan.isLandedWithFish()) {
+				cout << "Yay, the fish has been landed !";
+				cout << "Rebegin... .\n";
+			}
+			if (actionMan.isLandedWithNoFish()) {
+				cout << "No more line to bring in.\n";
+				cout << "Rebegin... .\n";
+			}
+			if (actionMan.throwBlocked()) {
+				cout << "Oh no, your line was blocked while throwing !\n";
+				cout << "Release the line before throwing ! Rebegin... .\n";
 			}
 
-			fishMan.update(lastFrameDurationMilliSeconds);
+			/*cout << "CAM: " << camera->getAbsolutePosition().X << " : "
+			 << camera->getAbsolutePosition().Y << " : "
+			 << camera->getAbsolutePosition().Z << endl;*/
 
 			driver->beginScene(true, true, video::SColor(0, 200, 200, 200));
 			smgr->drawAll();
