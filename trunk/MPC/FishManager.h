@@ -37,6 +37,7 @@ public:
 	void reset();
 
 	void setPosition(int ID, vector3df pos);
+	vector3df getPosition(int ID);
 	void setRotation(int ID, vector3df towardsPoint);
 	void releaseHook(int ID);
 	int checkForHooking(vector3df posOfHook);

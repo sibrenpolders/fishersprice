@@ -29,6 +29,7 @@ void SceneManager::initCamera() {
 	m_camera->setPosition(core::vector3df(3400.f, 297.f, 6500.f));
 	m_device->getCursorControl()->setVisible(false);
 	m_camera->setFarValue(10000);
+	m_camera->setRotation(vector3df(30, 180, 0));
 }
 
 void SceneManager::loadWater() {

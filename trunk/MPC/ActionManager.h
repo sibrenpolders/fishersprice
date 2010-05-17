@@ -20,7 +20,7 @@ public:
 
 	void update(int accelValues[], bool switchOn, int encoderValue,
 			int potentioValue, bool pushButtonOn,
-			unsigned int lastFrameDurationMilliSeconds);
+			unsigned int lastFrameDurationMilliSeconds, unsigned long now);
 
 	bool isHooked();
 	bool isBroken();
@@ -30,6 +30,7 @@ public:
 
 	void goLeft();
 	void goRight();
+	bool checkBuzz(unsigned long now);
 private:
 	bool m_isHooked;
 	bool m_isBroken;
@@ -37,10 +38,15 @@ private:
 	bool m_throwBlocked;
 	int m_hookedFishID;
 
-	int m_accelValues[3];
+	int* m_accelValues;
 	bool m_switchOn;
 	int m_encoderValue;
+	int m_potentioValue;
 	bool m_pushButtonOn;
+	bool m_hasThrownSinceReset;
+
+	unsigned long m_nextBuzz;
+	unsigned long m_nextSwimAway;
 
 	ICameraSceneNode * m_camera;
 	LocationTracker* m_locationTracker;
