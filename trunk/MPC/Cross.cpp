@@ -40,6 +40,11 @@ void Cross::reset() {
 void Cross::setCoords(vector3df coords) {
 	this->m_coords = coords;
 	m_cube->setPosition(m_coords);
+	setVisible(true);
+}
+
+vector3df Cross::getCoords() {
+	return m_cube->getAbsolutePosition();
 }
 
 void Cross::setVisible(bool visible) {
@@ -79,15 +84,8 @@ void Cross::swimAway(int nbUnits) {
 	m_lastMoveWasAway = true;
 }
 
-bool Cross::hasBroken() {
-	if (m_lastMoveWasAway && m_cube->getAbsolutePosition().Y > 100.f)
-		return true;
-	else
-		return false;
-}
-
 bool Cross::hasLanded() {
-	if (!m_lastMoveWasAway && m_cube->getAbsolutePosition().Y > 100.f) {
+	if (!m_lastMoveWasAway) {
 		vector3df ori = m_smgr->getActiveCamera()->getPosition();
 		ori.Y = 0.f;
 		float Y = m_cube->getAbsolutePosition().Y;

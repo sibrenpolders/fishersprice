@@ -34,6 +34,12 @@ public:
 	FishManager(IrrlichtDevice *device, IVideoDriver* driver,
 			ISceneManager* smgr);
 	virtual ~FishManager();
+	void reset();
+
+	void setPosition(int ID, vector3df pos);
+	void setRotation(int ID, vector3df towardsPoint);
+	void releaseHook(int ID);
+	int checkForHooking(vector3df posOfHook);
 	void update(unsigned long millisecs);
 	void addFish(TYPE_FISH fish, vector3df startPos, vector3df endPos,
 			int durationMilliSecs);
@@ -49,6 +55,7 @@ private:
 	std::string getMeshName(TYPE_FISH fish);
 	std::string getTextureName(TYPE_FISH fish);
 	core::vector3df getScale(TYPE_FISH fish);
+	vector3df calcRotation(vector3df from, vector3df to);
 };
 
 #endif

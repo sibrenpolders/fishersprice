@@ -1,6 +1,9 @@
 #ifndef CROSS_H_
 #define CROSS_H_
 
+// Klasse die de dobber voorstelt en ook niet meer dan dat.
+// Zie ActionManager voor het geheel.
+
 #include <irrlicht.h>
 #include <iostream>
 #include <string>
@@ -17,12 +20,12 @@ public:
 	virtual ~Cross();
 	void reset();
 
-	void setCoords(vector3df coords); // for when thrown in
+	void setCoords(vector3df coords); // for when to throw in
 	void setVisible(bool visible);
+	vector3df getCoords();
 
-	void bringIn(int nbTicksOfReel);
-	void swimAway(int nbUnits);
-	bool hasBroken();
+	void bringIn(int nbTicksOfReel); // related to serial input
+	void swimAway(int nbUnits); // related to the power of the fish
 	bool hasLanded();
 
 private:

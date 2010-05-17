@@ -9,6 +9,7 @@ SceneManager::SceneManager(IrrlichtDevice *device, IVideoDriver* driver,
 }
 
 SceneManager::~SceneManager() {
+
 }
 
 ICameraSceneNode * SceneManager::init() {
@@ -25,7 +26,7 @@ ICameraSceneNode * SceneManager::init() {
 void SceneManager::initCamera() {
 	//parent = 0, rotateSpeed AKA mouse = 100, moveSpeed = 0.8f
 	m_camera = m_smgr->addCameraSceneNodeFPS(0, 100.f, 1.0f);
-	m_camera->setPosition(core::vector3df(4532.f, 297.f, 6500.f));
+	m_camera->setPosition(core::vector3df(3400.f, 297.f, 6500.f));
 	m_device->getCursorControl()->setVisible(false);
 	m_camera->setFarValue(10000);
 }

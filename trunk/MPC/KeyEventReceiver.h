@@ -2,6 +2,7 @@
 #define KEYEVENTRECEIVER_H_
 
 #include <irrlicht.h>
+#include "ActionManager.h"
 using namespace irr;
 
 class KeyEventReceiver: public IEventReceiver {
@@ -9,6 +10,10 @@ public:
 
 	KeyEventReceiver() {
 		m_stopApp = false;
+	}
+
+	void setActionManager(ActionManager* aMan) {
+		m_actionMan = aMan;
 	}
 
 	bool getStopApp() {
@@ -23,6 +28,12 @@ public:
 			case irr::KEY_KEY_Q:
 				m_stopApp = true;
 				return true;
+			case irr::KEY_KEY_Z:
+				m_actionMan->goLeft();
+				return true;
+			case irr::KEY_KEY_X:
+				m_actionMan->goRight();
+				return true;
 			default:
 				break;
 			}
@@ -33,6 +44,7 @@ public:
 
 private:
 	bool m_stopApp;
+	ActionManager* m_actionMan;
 };
 
 #endif
