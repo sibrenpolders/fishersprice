@@ -39,12 +39,19 @@ const int USB_Controller::PUSH = 1;
 const int USB_Controller::ROTATION = 2;
 const int USB_Controller::POTENTIO_METER = 3;
 const int USB_Controller::ACCEL = 4;
+const int USB_Controller::SOURCE = 5;
+const char* USB_Controller::HIGH = "PH";
+const char* USB_Controller::LOW = "PL";
 
-USB_Controller::USB_Controller(string device_name) {
+USB_Controller::USB_Controller() {
+
+}
+
+bool USB_Controller::init(std::string device_name) {
 	fd = open(device_name.c_str(), O_RDWR | O_NOCTTY);
 	if (fd < 0) {
 		perror(device_name.c_str());
-		exit(-1);
+		return false;
 	}
 	tcgetattr(fd, &oldtio); /* save current serial port settings */
 	bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
@@ -105,13 +112,15 @@ USB_Controller::USB_Controller(string device_name) {
 	 */
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &newtio);
+
+	return true;
 }
 
 USB_Controller::~USB_Controller() {
 	tcsetattr(fd, TCSANOW, &oldtio);
 }
 
-void USB_Controller::update() {
+int USB_Controller::update() {
 	/* read blocks program execution until a line terminating character is
 	 input, even if more than 255 chars are input. If the number
 	 of characters read is smaller than the number of chars available,
@@ -120,25 +129,35 @@ void USB_Controller::update() {
 	char buf[255];
 	int res = read(fd, buf, 255);
 	buf[res] = '\0'; /* set end of string, so we can printf */
+	cout << buf << endl;
+	parse(buf);
+	//write(fd, HIGH, strlen(HIGH));
 
-	if (strlen(buf) > 13)
-		parse(buf);
+	return res;
 }
 
 void USB_Controller::parse(char* string) {
-	char* res;
+	if (strlen(string) > 4) {
+		char* res;
 
-	res = strtok(string, DELIM);
+		char tmp[512];
 
-	int substring_number = 0;
-	while (res != NULL) {
-		setValue(substring_number, res);
-		res = strtok(NULL, DELIM);
-		++substring_number;
-	}
+		strcpy(tmp, string);
+		cout << "INPUT_STRING " << tmp << " Length: " << strlen(string) << endl;
 
-	if (substring_number != 5) {
-		cerr << "ERROR1: something wrong in serial communication.\n";
+		res = strtok(string, DELIM);
+
+		int substring_number = 0;
+		while (res != NULL) {
+			cout << "STRTOK_VALUE: " << res << endl;
+			setValue(substring_number, res);
+			res = strtok(NULL, DELIM);
+			++substring_number;
+		}
+
+		if (substring_number != 6) {
+			cerr << "ERROR: something wrong in serial communication.\n";
+		}
 	}
 }
 
@@ -159,8 +178,11 @@ void USB_Controller::setValue(int substring_number, char* value) {
 	case POTENTIO_METER:
 		set_potentiometer_value(value);
 		break;
+	case SOURCE:
+		;
+		break;
 	default:
-		cerr << "ERROR2: something wrong in serial communication.\n";
+		cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
@@ -179,8 +201,6 @@ void USB_Controller::set_accel(char* value) {
 }
 
 void USB_Controller::set_switch_on(char* value) {
-	char* p = new char[5];
-	strcpy(p, value);
 	switch (atoi(value)) {
 	case 0:
 		m_switch_on = false;
@@ -208,6 +228,10 @@ void USB_Controller::get_accel(int values[3]) {
 	}
 }
 
+int USB_Controller::get_accelY() {
+	return accel_values[1];
+}
+
 bool USB_Controller::switch_on(void) {
 	return m_switch_on;
 }
@@ -221,10 +245,6 @@ int USB_Controller::get_potentiometer_value(void) {
 }
 
 void USB_Controller::buzz(int timeout) {
-	std::string s = "";
-	s += timeout;
-	s += "\n";
-	write(fd, (char*) (s.c_str()), s.length());
 }
 
 bool USB_Controller::push_on(void) {

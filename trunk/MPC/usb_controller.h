@@ -8,18 +8,21 @@ using namespace std;
 
 class USB_Controller {
 public:
-	USB_Controller(std::string device_name);
+	USB_Controller();
+	bool init(std::string device_name);
 	~USB_Controller();
 
 	// read a string from the serial port and parse it
-	void update();
+	int update();
 
 	// getters
 	void get_accel(int values[3]);
+	int get_accelY();
 	bool switch_on(void);
 	int get_rotation_value(void);
 	int get_potentiometer_value(void);
 	bool push_on(void);
+
 	// send buzz command to arduino
 	void buzz(int timeout);
 private:
@@ -41,6 +44,9 @@ private:
 	const static int ROTATION;
 	const static int POTENTIO_METER;
 	const static int PUSH;
+	const static int SOURCE;
+	const static char* HIGH;
+	const static char* LOW;
 
 	// member functions
 

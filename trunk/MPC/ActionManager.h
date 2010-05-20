@@ -18,9 +18,10 @@ public:
 	virtual ~ActionManager();
 	void reset();
 
-	void update(int accelValues[], bool switchOn, int encoderValue,
-			int potentioValue, bool pushButtonOn,
-			unsigned int lastFrameDurationMilliSeconds, unsigned long now);
+	void insertArduinoValues(int accelY, bool switchOn, int encoderValue,
+			int potentioValue, bool pushButtonOn);
+
+	void update(unsigned int lastFrameDurationMilliSeconds, unsigned long now);
 
 	bool isHooked();
 	bool isBroken();
@@ -38,9 +39,10 @@ private:
 	bool m_throwBlocked;
 	int m_hookedFishID;
 
-	int* m_accelValues;
+	int m_accelY;
 	bool m_switchOn;
 	int m_encoderValue;
+	int m_prevEncoderValue;
 	int m_potentioValue;
 	bool m_pushButtonOn;
 	bool m_hasThrownSinceReset;
