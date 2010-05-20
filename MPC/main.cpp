@@ -21,33 +21,17 @@ using namespace std;
 void calibrate(USB_Controller* usbController, LocationTracker* locationTracker) {
 	int values[3];
 
-	// Upperleft
-	cout << "Point the top of the rod towards the upperleft corner.\n";
-	sleep(5);
+	// back
+	cout << "Point the top of the rod to the ground behind you.\n";
+	sleep(8);
 	usbController->update();
-	usbController->get_accel(values);
-	locationTracker->calibrateUpperLeft(values);
+	locationTracker->calibrateBack(usbController->get_accelY());
 
-	// Upperright
-	cout << "Point the top of the rod towards the upperright corner.\n";
-	sleep(5);
+	// front
+	cout << "Point the top of the rod to the ground in front of you.\n";
+	sleep(8);
 	usbController->update();
-	usbController->get_accel(values);
-	locationTracker->calibrateUpperRight(values);
-
-	// Lowerleft
-	cout << "Point the top of the rod towards the lowerleft corner.\n";
-	sleep(5);
-	usbController->update();
-	usbController->get_accel(values);
-	locationTracker->calibrateLowerLeft(values);
-
-	// Lowerleft
-	cout << "Point the top of the rod towards the back of you.\n";
-	sleep(5);
-	usbController->update();
-	usbController->get_accel(values);
-	locationTracker->calibrateBackwards(values);
+	locationTracker->calibrateFront(usbController->get_accelY());
 
 	locationTracker->reset();
 }
@@ -67,14 +51,15 @@ void printUSBControllerValues(USB_Controller* usbController) {
 }
 
 int main() {
-	USB_Controller usbController("/dev/ttyUSB0");
+	USB_Controller usbController;
+	bool arduinoInputAvailable = usbController.init("/dev/ttyUSB0");
 	LocationTracker locationTracker;
-	locationTracker.setScreenDimensions(800, 600);
 
-	/*
-	 cout << "Initiating calibration... .\n";Rebegin... .\n";
-	 sleep(10);
-	 calibrate(&usbController, &locationTracker);*/
+	if (arduinoInputAvailable) {
+		cout << "Initiating calibration... .\n";
+		sleep(5);
+		calibrate(&usbController, &locationTracker);
+	}
 
 	IrrlichtDevice *device = createDevice(EDT_OPENGL, core::dimension2d<u32>(
 			800, 600), 16, false, true, false);
@@ -108,17 +93,20 @@ int main() {
 			then = now;
 
 			// retrieve serial values
-			usbController.update();
-			printUSBControllerValues(&usbController);
-			 int accelValues[3];
-			 usbController.get_accel(accelValues);
-			 bool switchOn = usbController.switch_on();
-			 int encoderValue = usbController.get_rotation_value();
-			 int potentioValue = usbController.get_potentiometer_value();
-			 bool pushButtonOn = usbController.push_on();
+			if (arduinoInputAvailable && usbController.update() > 4) {
+				printUSBControllerValues(&usbController);
+				int accelY = usbController.get_accelY();
+				bool switchOn = usbController.switch_on();
+				int encoderValue = usbController.get_rotation_value();
+				int potentioValue = usbController.get_potentiometer_value();
+				bool pushButtonOn = usbController.push_on();
 
-			 //actionMan.update(accelValues, switchOn, encoderValue,
-			//potentioValue, pushButtonOn, lastFrameDurationMilliSeconds, now);
+				actionMan.insertArduinoValues(accelY, switchOn, encoderValue,
+						potentioValue, pushButtonOn);
+			}
+
+			actionMan.update(lastFrameDurationMilliSeconds, now);
+
 			if (actionMan.isHooked()) {
 				cout << "A fish has been hooked, bring it in!\n";
 			}
@@ -140,7 +128,7 @@ int main() {
 						<< "Release the line before throwing! Rebegin/reset... .\n";
 			}
 
-			if (actionMan.checkBuzz(now))
+			if (actionMan.checkBuzz(now) && arduinoInputAvailable)
 				usbController.buzz(100);
 
 			/*cout << "CAM: " << camera->getAbsolutePosition().X << " : "

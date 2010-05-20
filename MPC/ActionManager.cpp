@@ -6,7 +6,6 @@ ActionManager::ActionManager(ICameraSceneNode * camera,
 	m_locationTracker = locationTracker;
 	m_cross = cross;
 	m_fishMan = fishMan;
-	m_accelValues = new int[3];
 	reset();
 }
 
@@ -29,6 +28,13 @@ void ActionManager::reset() {
 
 	m_nextBuzz = 0;
 	m_nextSwimAway = 0;
+
+	m_accelY = 0;
+	m_switchOn = true;
+	m_encoderValue = 0;
+	m_prevEncoderValue = 0;
+	m_potentioValue = 0;
+	m_pushButtonOn = 0;
 }
 
 bool ActionManager::isHooked() {
@@ -53,16 +59,18 @@ bool ActionManager::throwBlocked() {
 	return m_throwBlocked;
 }
 
-void ActionManager::update(int accelValues[], bool switchOn, int encoderValue,
-		int potentioValue, bool pushButtonOn,
-		unsigned int lastFrameDurationMilliSeconds, unsigned long now) {
-	memcpy(m_accelValues, accelValues, 3 * sizeof(int));
+void ActionManager::insertArduinoValues(int accelY, bool switchOn,
+		int encoderValue, int potentioValue, bool pushButtonOn) {
+	m_accelY = accelY;
 	m_switchOn = switchOn;
-	int prevEncoderValue = m_encoderValue;
+	m_prevEncoderValue = m_encoderValue;
 	m_encoderValue = encoderValue;
 	m_potentioValue = potentioValue;
 	m_pushButtonOn = pushButtonOn;
+}
 
+void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
+		unsigned long now) {
 	m_fishMan->update(lastFrameDurationMilliSeconds);
 
 	if (m_pushButtonOn)
@@ -70,7 +78,7 @@ void ActionManager::update(int accelValues[], bool switchOn, int encoderValue,
 	else if (m_isBroken || m_isLanded || m_throwBlocked)
 		return;
 	else if (!m_hasThrownSinceReset) {
-		m_locationTracker->insertNewValues(m_accelValues, now);
+		m_locationTracker->insertNewValue(m_accelY, now);
 		bool ready = m_locationTracker->newThrowReady();
 		if (ready && m_switchOn) {
 			m_throwBlocked = true; // line has to be released before throwing it
@@ -89,9 +97,9 @@ void ActionManager::update(int accelValues[], bool switchOn, int encoderValue,
 	} else if (m_cross->hasLanded())
 		m_isLanded = true;
 	else if (m_isHooked) {
-		if (prevEncoderValue != encoderValue) {
-			if ((prevEncoderValue - encoderValue) < potentioValue / 200.f) {
-				m_cross->bringIn(prevEncoderValue - encoderValue);
+		if (m_prevEncoderValue != m_encoderValue) {
+			if ((m_prevEncoderValue - m_encoderValue) < m_potentioValue / 200.f) {
+				m_cross->bringIn(m_prevEncoderValue - m_encoderValue);
 				vector3df pos = m_cross->getCoords();
 				m_fishMan->setPosition(m_hookedFishID, pos);
 
@@ -139,8 +147,8 @@ void ActionManager::update(int accelValues[], bool switchOn, int encoderValue,
 			m_fishMan->setRotation(m_hookedFishID, coordsTo);
 		}
 
-		if (prevEncoderValue != encoderValue)
-			m_cross->bringIn(prevEncoderValue - encoderValue);
+		if (m_prevEncoderValue != m_encoderValue)
+			m_cross->bringIn(m_prevEncoderValue - m_encoderValue);
 	}
 }
 
