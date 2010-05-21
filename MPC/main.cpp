@@ -8,6 +8,9 @@
 #include "usb_controller.h"
 #include "KeyEventReceiver.h"
 #include "Cross.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -51,6 +54,8 @@ void printUSBControllerValues(USB_Controller* usbController) {
 }
 
 int main() {
+	srand(time(NULL));
+
 	USB_Controller usbController;
 	bool arduinoInputAvailable = usbController.init("/dev/ttyUSB0");
 	LocationTracker locationTracker;

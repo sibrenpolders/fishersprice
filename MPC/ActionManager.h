@@ -29,9 +29,14 @@ public:
 	bool isLandedWithNoFish();
 	bool throwBlocked();
 
+	bool checkBuzz(unsigned long now);
+
+	// For keyboard input
 	void goLeft();
 	void goRight();
-	bool checkBuzz(unsigned long now);
+	void toggleSwitch();
+	void throwIn();
+	void bringInOneUnit();
 private:
 	bool m_isHooked;
 	bool m_isBroken;
@@ -46,6 +51,8 @@ private:
 	int m_potentioValue;
 	bool m_pushButtonOn;
 	bool m_hasThrownSinceReset;
+
+	bool m_encoderValuesSetWithArduino;
 
 	unsigned long m_nextBuzz;
 	unsigned long m_nextSwimAway;
