@@ -34,6 +34,18 @@ public:
 			case irr::KEY_KEY_X:
 				m_actionMan->goRight();
 				return true;
+			case irr::KEY_KEY_P:
+				m_actionMan->reset();
+				return true;
+			case irr::KEY_KEY_T:
+				m_actionMan->toggleSwitch();
+				return true;
+			case irr::KEY_KEY_R:
+				m_actionMan->throwIn();
+				return true;
+			case irr::KEY_KEY_M:
+				m_actionMan->bringInOneUnit();
+				return true;
 			default:
 				break;
 			}
