@@ -13,10 +13,6 @@
 #include <iostream>
 using namespace std;
 
-/* baudrate settings are defined in <asm/termbits.h>, which is
- included by <termios.h> */
-#define BAUDRATE B9600            
-
 const char* USB_Controller::DELIM = ":";
 const int USB_Controller::SWITCH = 0;
 const int USB_Controller::PUSH = 1;

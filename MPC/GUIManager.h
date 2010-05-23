@@ -15,7 +15,9 @@ using namespace video;
 using namespace std;
 using namespace gui;
 
-typedef enum GUI_ID{
+#define SCREEN_WIDTH 1280//1024
+#define SCREEN_HEIGTH 800//768
+typedef enum GUI_ID {
 	GUI_ID_DIALOG_ROOT_WINDOW = 0x10000,
 	GUI_ID_RECEIVED_ARDUINO,
 	GUI_ID_ACCEL,
@@ -24,10 +26,6 @@ typedef enum GUI_ID{
 	GUI_ID_PUSH,
 	GUI_ID_SWITCH,
 	GUI_ID_GAME_MESSAGE,
-
-	// And some magic numbers
-	MAX_FRAMERATE = 1000,
-	DEFAULT_FRAMERATE = 30
 } GUI_ID;
 
 class GUIManager {

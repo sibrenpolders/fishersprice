@@ -22,9 +22,9 @@ void GUIManager::init() {
 		e->remove();
 
 	// create the toolbox window
-	IGUIWindow* wnd = env->addWindow(core::rect<s32>(1000, 0, 1280, 500),
-			false, L"", 0, GUI_ID_DIALOG_ROOT_WINDOW);
-			IGUITabControl* tab = env->addTabControl(core::rect<s32>(2,20,1280-1002,500-7), wnd, true, true);
+	IGUIWindow* wnd = env->addWindow(core::rect<s32>(SCREEN_WIDTH - 280, 0,
+			SCREEN_WIDTH, 500), false, L"", 0, GUI_ID_DIALOG_ROOT_WINDOW);
+	IGUITabControl* tab = env->addTabControl(core::rect<s32>(2,20,278,493), wnd, true, true);
 	IGUITab* t1 = tab->addTab(L"Output");
 	env->addStaticText(L"Received Arduino message:", core::rect<s32>(10,20,280,45), false, true, t1);
 	env->addStaticText(L"N/A", core::rect<s32>(20,45,280,95), true, true, t1, GUI_ID_RECEIVED_ARDUINO);
