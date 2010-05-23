@@ -1,5 +1,6 @@
 #include <irrlicht.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "SceneManager.h"
 #include "LocationTracker.h"
@@ -44,14 +45,19 @@ void calibrate(USB_Controller* usbController, LocationTracker* locationTracker,
 	locationTracker->reset();
 }
 
+std::string intToString(int val) {
+	std::ostringstream stm;
+	stm << val;
+	return stm.str();
+}
+
 void printUSBControllerValues(USB_Controller* usbController,
 		GUIManager* guiManager) {
-	guiManager->setText(GUI_ID_ACCEL, std::string(usbController->get_accelY()
-			+ ""));
-	guiManager->setText(GUI_ID_POT, std::string(
-			usbController->get_potentiometer_value() + ""));
-	guiManager->setText(GUI_ID_ENCODER, std::string(
-			usbController->get_rotation_value() + ""));
+	guiManager->setText(GUI_ID_ACCEL, intToString(usbController->get_accelY()));
+	guiManager->setText(GUI_ID_POT, intToString(
+			usbController->get_potentiometer_value()));
+	guiManager->setText(GUI_ID_ENCODER, intToString(
+			usbController->get_rotation_value()));
 
 	if (usbController->switch_on())
 		guiManager->setText(GUI_ID_SWITCH, std::string("on"));
@@ -62,11 +68,6 @@ void printUSBControllerValues(USB_Controller* usbController,
 		guiManager->setText(GUI_ID_PUSH, std::string("on"));
 	else
 		guiManager->setText(GUI_ID_PUSH, std::string("off"));
-}
-
-void showMessage(IrrlichtDevice *device, std::string caption,
-		std::string message) {
-
 }
 
 int main() {

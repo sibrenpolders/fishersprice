@@ -29,6 +29,13 @@ const char* USB_Controller::LOW = "SL";
 
 USB_Controller::USB_Controller(GUIManager* guiMan) {
 	m_guiMan = guiMan;
+	accel_values[0] = 0;
+	accel_values[1] = 0;
+	accel_values[2] = 0;
+	m_switch_on = false;
+	rotation_value = 0;
+	potentiometer_value = 0;
+	push = false;
 }
 
 bool USB_Controller::init(std::string device_name) {
@@ -229,15 +236,15 @@ void USB_Controller::buzz(int timeout) {
 }
 
 bool USB_Controller::push_on(void) {
-	return !push;
+	return push;
 }
 
 void USB_Controller::set_push_on(char* value) {
 	switch (atoi(value)) {
-	case 0:
+	case 1:
 		push = false;
 		break;
-	case 1:
+	case 0:
 		push = true;
 		break;
 	default:
