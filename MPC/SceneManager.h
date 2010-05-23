@@ -9,6 +9,8 @@ using namespace scene;
 using namespace video;
 using namespace std;
 
+#define GRAVITY_ON false
+
 class SceneManager {
 public:
 	SceneManager(IrrlichtDevice *device, IVideoDriver* driver,

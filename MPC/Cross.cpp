@@ -28,7 +28,13 @@ Cross::~Cross() {
 }
 
 void Cross::reset() {
-	setVisible(false);
+	vector3df ori = m_smgr->getActiveCamera()->getAbsolutePosition();
+	ori.Z += 5000.f;
+	ori.X += 5000.f;
+	ori.Y = DEFAULT_DEPTH_CROSS - 10000.f;
+	setCoords(ori);
+
+	setVisible(true);
 	m_lastMoveWasAway = false;
 }
 
@@ -58,7 +64,7 @@ void Cross::bringIn(int nbTicksOfReel) {
 
 	vector3df newPosition = ori + (1.0f - ratio) * (m_coords - ori);
 
-	if (ori.getDistanceFrom(newPosition) >= 500.f)
+	if (ori.getDistanceFrom(newPosition) >= 200.f)
 		newPosition.Y = DEFAULT_DEPTH_CROSS;
 	setCoords(newPosition);
 	m_lastMoveWasAway = false;
