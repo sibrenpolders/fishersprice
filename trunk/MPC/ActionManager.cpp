@@ -199,8 +199,6 @@ void ActionManager::throwIn() {
 }
 
 void ActionManager::bringInOneUnit() {
-	cout << "Bring the line in.\n";
-
 	m_prevEncoderValue = m_encoderValue;
 	m_encoderValue -= 10;
 }

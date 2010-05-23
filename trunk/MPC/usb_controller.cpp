@@ -1,33 +1,17 @@
 #include "usb_controller.h"
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
-
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <stdio.h>
 #include <stdlib.h>
-
 #include <stdio.h>   /* Standard input/output definitions */
 #include <string.h>  /* String function definitions */
 #include <unistd.h>  /* UNIX standard function definitions */
 #include <fcntl.h>   /* File control definitions */
 #include <errno.h>   /* Error number definitions */
 #include <termios.h> /* POSIX terminal control definitions */
-
-#include "capser.h"
-
+#include "capser.c"
 #include <iostream>
 using namespace std;
-
-//#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/time.h>
 
 /* baudrate settings are defined in <asm/termbits.h>, which is
  included by <termios.h> */
@@ -40,11 +24,11 @@ const int USB_Controller::ROTATION = 2;
 const int USB_Controller::POTENTIO_METER = 3;
 const int USB_Controller::ACCEL = 4;
 const int USB_Controller::SOURCE = 5;
-const char* USB_Controller::HIGH = "PH";
-const char* USB_Controller::LOW = "PL";
+const char* USB_Controller::HIGH = "SH";
+const char* USB_Controller::LOW = "SL";
 
-USB_Controller::USB_Controller() {
-
+USB_Controller::USB_Controller(GUIManager* guiMan) {
+	m_guiMan = guiMan;
 }
 
 bool USB_Controller::init(std::string device_name) {
@@ -129,35 +113,30 @@ int USB_Controller::update() {
 	char buf[255];
 	int res = read(fd, buf, 255);
 	buf[res] = '\0'; /* set end of string, so we can printf */
-	cout << buf << endl;
-	parse(buf);
+	if (res > 8) {
+		m_guiMan->setText(GUI_ID_RECEIVED_ARDUINO, std::string(buf));
+		parse(buf);
+	}
 	//write(fd, HIGH, strlen(HIGH));
 
 	return res;
 }
 
 void USB_Controller::parse(char* string) {
-	if (strlen(string) > 4) {
-		char* res;
+	char* res;
+	char tmp[512];
+	strcpy(tmp, string);
+	res = strtok(string, DELIM);
 
-		char tmp[512];
+	int substring_number = 0;
+	while (res != NULL) {
+		setValue(substring_number, res);
+		res = strtok(NULL, DELIM);
+		++substring_number;
+	}
 
-		strcpy(tmp, string);
-		cout << "INPUT_STRING " << tmp << " Length: " << strlen(string) << endl;
-
-		res = strtok(string, DELIM);
-
-		int substring_number = 0;
-		while (res != NULL) {
-			cout << "STRTOK_VALUE: " << res << endl;
-			setValue(substring_number, res);
-			res = strtok(NULL, DELIM);
-			++substring_number;
-		}
-
-		if (substring_number != 6) {
-			cerr << "ERROR: something wrong in serial communication.\n";
-		}
+	if (substring_number != 6) {
+		;//cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
@@ -182,7 +161,7 @@ void USB_Controller::setValue(int substring_number, char* value) {
 		;
 		break;
 	default:
-		cerr << "ERROR: something wrong in serial communication.\n";
+		;//cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
@@ -245,10 +224,12 @@ int USB_Controller::get_potentiometer_value(void) {
 }
 
 void USB_Controller::buzz(int timeout) {
+	cout << "Sending: " << HIGH << endl;
+	write(fd, HIGH, strlen(HIGH));
 }
 
 bool USB_Controller::push_on(void) {
-	return push;
+	return !push;
 }
 
 void USB_Controller::set_push_on(char* value) {
