@@ -181,7 +181,7 @@ int main() {
 				}
 				actionMan.update(lastFrameDurationMilliSeconds, now);
 
-				if (actionMan.isHooked()) {
+				if (actionMan.isHooked() && !actionMan.isLandedWithFish()) {
 					guiMan.setText(GUI_ID_GAME_MESSAGE,
 							"Gotcha !\nA fish has been hooked, bring it in!");
 				} else if (actionMan.isBroken()) {
@@ -208,9 +208,9 @@ int main() {
 				break;
 			}
 
-			/*cout << "CAM: " << camera->getAbsolutePosition().X << " : "
-			 << camera->getAbsolutePosition().Y << " : "
-			 << camera->getAbsolutePosition().Z << endl;*/
+			/*cout << "CAM: " << pcamera->getAbsolutePosition().X << " : "
+			 << pcamera->getAbsolutePosition().Y << " : "
+			 << pcamera->getAbsolutePosition().Z << endl;*/
 
 			pdriver->beginScene(true, true, video::SColor(0, 200, 200, 200));
 			psmgr->drawAll();

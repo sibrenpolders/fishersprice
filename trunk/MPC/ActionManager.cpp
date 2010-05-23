@@ -18,14 +18,6 @@ ActionManager::~ActionManager() {
 }
 
 void ActionManager::reset() {
-	m_isHooked = false;
-	m_isBroken = false;
-	m_isLanded = false;
-	m_throwBlocked = false;
-	m_hasThrownSinceReset = false;
-	m_encoderValuesSetWithArduino = false;
-	m_hookedFishID = -1;
-
 	m_fishMan->reset();
 	m_locationTracker->reset();
 	m_cross->reset();
@@ -40,6 +32,14 @@ void ActionManager::reset() {
 	m_prevEncoderValue = 0;
 	m_potentioValue = 500;
 	m_pushButtonOn = 0;
+
+	m_isHooked = false;
+	m_isBroken = false;
+	m_isLanded = false;
+	m_throwBlocked = false;
+	m_hasThrownSinceReset = false;
+	m_encoderValuesSetWithArduino = false;
+	m_hookedFishID = -1;
 }
 
 bool ActionManager::isHooked() {
@@ -194,7 +194,8 @@ void ActionManager::throwIn() {
 		unsigned int timeInterval = 1.f * (rand() % 500 + 100);
 		float distance = 1.0 * 2500.f * (100.f / timeInterval);
 		m_cross->setVisible(true);
-		m_cross->setCoords(vector3df(coords.X, 100.f, coords.Z - distance));
+		m_cross->setCoords(vector3df(coords.X, DEFAULT_DEPTH_CROSS, coords.Z
+				- distance));
 	}
 }
 

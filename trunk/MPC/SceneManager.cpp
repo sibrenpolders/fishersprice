@@ -26,10 +26,10 @@ ICameraSceneNode * SceneManager::init() {
 void SceneManager::initCamera() {
 	//parent = 0, rotateSpeed AKA mouse = 100, moveSpeed = 0.8f
 	m_camera = m_smgr->addCameraSceneNodeFPS(0, 100.f, 1.0f);
-	m_camera->setPosition(core::vector3df(3400.f, 297.f, 6500.f));
+	m_camera->setPosition(core::vector3df(3675.f, 270.f, 6500.f));
 	m_device->getCursorControl()->setVisible(false);
 	m_camera->setFarValue(10000);
-	m_camera->setRotation(vector3df(30, 180, 0));
+	m_camera->setRotation(vector3df(30.f, 180.f, 0));
 }
 
 void SceneManager::loadWater() {
@@ -84,11 +84,15 @@ void SceneManager::loadTerrain() {
 	terrain->setTriangleSelector(m_terrainSelector);
 
 	// create collision response animator and attach it to the camera
-	scene::ISceneNodeAnimator* anim = m_smgr->createCollisionResponseAnimator(
-			m_terrainSelector, m_camera, core::vector3df(60, 100, 60),
-			core::vector3df(0, -20.f, 0), core::vector3df(0, 50, 0));
-	m_camera->addAnimator(anim);
-	anim->drop();
+	if (GRAVITY_ON) {
+		scene::ISceneNodeAnimator
+				* anim = m_smgr->createCollisionResponseAnimator(
+						m_terrainSelector, m_camera, core::vector3df(60, 100,
+								60), core::vector3df(0, -20.f, 0),
+						core::vector3df(0, 40, 0));
+		m_camera->addAnimator(anim);
+		anim->drop();
+	}
 }
 
 void SceneManager::loadSky() {
