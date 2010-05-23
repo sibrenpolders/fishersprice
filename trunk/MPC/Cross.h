@@ -13,6 +13,8 @@ using namespace scene;
 using namespace video;
 using namespace std;
 
+#define DEFAULT_DEPTH_CROSS 100.f
+
 class Cross {
 public:
 	Cross(irr::video::IVideoDriver* driver, scene::ISceneManager* smgr,

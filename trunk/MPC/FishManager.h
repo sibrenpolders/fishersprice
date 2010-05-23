@@ -11,6 +11,8 @@ using namespace scene;
 using namespace video;
 using namespace std;
 
+#define DEFAULT_DEPTH_FISH 75.f
+
 typedef enum TYPE_FISH {
 	CLOWN, SHARK, MORAY, PERCH
 } TYPE_FISH;

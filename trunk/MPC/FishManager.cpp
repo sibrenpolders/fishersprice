@@ -30,7 +30,7 @@ void FishManager::setPosition(int ID, vector3df pos) {
 	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
 		FishInfo* info = m_fishes[i];
 		if (info->ID == ID) {
-			pos.Y = 75.f;
+			pos.Y = DEFAULT_DEPTH_FISH;
 			info->currPos = pos;
 			info->node->setPosition(pos);
 		}
@@ -74,13 +74,17 @@ void FishManager::releaseHook(int ID) {
 }
 
 int FishManager::checkForHooking(vector3df posOfHook) {
+	float prevY = posOfHook.Y;
+	posOfHook.Y = DEFAULT_DEPTH_FISH;
 	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
 		FishInfo* info = m_fishes[i];
-		if (info->currPos.getDistanceFrom(posOfHook) <= 100) {
+		if (info->currPos.getDistanceFrom(posOfHook) <= 70.f) {
 			info->isHooked = true;
 			return info->ID;
 		}
 	}
+
+	posOfHook.Y = prevY;
 	return -1;
 }
 
