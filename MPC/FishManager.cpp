@@ -30,6 +30,7 @@ void FishManager::setPosition(int ID, vector3df pos) {
 	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
 		FishInfo* info = m_fishes[i];
 		if (info->ID == ID) {
+			pos.Y = 75.f;
 			info->currPos = pos;
 			info->node->setPosition(pos);
 		}
@@ -86,6 +87,7 @@ int FishManager::checkForHooking(vector3df posOfHook) {
 void FishManager::update(unsigned long millisecs) {
 	for (unsigned int i = 0; i < m_fishes.size(); ++i) {
 		FishInfo* info = m_fishes[i];
+
 		if (!info->isHooked) {
 			// Check if the fish must return
 			if (info->currMilliSecsPassed + millisecs >= info->duration) {

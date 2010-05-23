@@ -20,10 +20,10 @@ Cross::Cross(irr::video::IVideoDriver* driver, scene::ISceneManager* smgr,
 	m_cube->setMaterialFlag(video::EMF_LIGHTING, false);
 	m_cube->setMaterialTexture(0, driver->getTexture("./media/red.jpg"));
 
-	scene::ISceneNodeAnimator* anim = m_smgr->createCollisionResponseAnimator(
-			terrainSelector, m_cube);
-	m_cube->addAnimator(anim);
-	anim->drop();
+	//scene::ISceneNodeAnimator* anim = m_smgr->createCollisionResponseAnimator(
+	//		terrainSelector, m_cube);
+	//m_cube->addAnimator(anim);
+	//anim->drop();
 
 	reset();
 }
@@ -38,7 +38,10 @@ void Cross::reset() {
 }
 
 void Cross::setCoords(vector3df coords) {
+	if (coords.Y < 100.f)
+		coords.Y = 100.f;
 	this->m_coords = coords;
+
 	m_cube->setPosition(m_coords);
 }
 
@@ -53,32 +56,32 @@ void Cross::setVisible(bool visible) {
 
 void Cross::bringIn(int nbTicksOfReel) {
 	vector3df ori = m_smgr->getActiveCamera()->getPosition();
-	ori.Y = 0.f;
+	//ori.Y = 0.f;
 	float Y = m_cube->getAbsolutePosition().Y;
 	m_coords = m_cube->getAbsolutePosition();
-	m_coords.Y = 0.f;
+	//m_coords.Y = 0.f;
 	double distance = ori.getDistanceFrom(m_coords);
 	double distanceToTravel = 5 * nbTicksOfReel;
 	double ratio = distanceToTravel / distance;
 
 	vector3df newPosition = ori + (1.0f - ratio) * (m_coords - ori);
-	newPosition.Y = Y;
+	//newPosition.Y = Y;
 	setCoords(newPosition);
 	m_lastMoveWasAway = false;
 }
 
 void Cross::swimAway(int nbUnits) {
 	vector3df ori = m_smgr->getActiveCamera()->getPosition();
-	ori.Y = 0.f;
+	//ori.Y = 0.f;
 	float Y = m_cube->getAbsolutePosition().Y;
 	m_coords = m_cube->getAbsolutePosition();
-	m_coords.Y = 0.f;
+	//m_coords.Y = 0.f;
 	double distance = ori.getDistanceFrom(m_coords);
 	double distanceToTravel = 5 * nbUnits;
 	double ratio = distanceToTravel / distance;
 
 	vector3df newPosition = ori + (1.0f + ratio) * (m_coords - ori);
-	newPosition.Y = Y;
+	//newPosition.Y = Y;
 	setCoords(newPosition);
 	m_lastMoveWasAway = true;
 }
@@ -86,12 +89,12 @@ void Cross::swimAway(int nbUnits) {
 bool Cross::hasLanded() {
 	if (!m_lastMoveWasAway) {
 		vector3df ori = m_smgr->getActiveCamera()->getPosition();
-		ori.Y = 0.f;
+		//ori.Y = 0.f;
 		float Y = m_cube->getAbsolutePosition().Y;
 		m_coords = m_cube->getAbsolutePosition();
-		m_coords.Y = 0.f;
+		//m_coords.Y = 0.f;
 		double distance = ori.getDistanceFrom(m_coords);
-		m_coords.Y = Y;
+		//m_coords.Y = Y;
 
 		return distance <= 50.f;
 	} else

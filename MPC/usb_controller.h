@@ -4,11 +4,12 @@
 #include <termios.h>
 #include <string>
 #include <string.h>
+#include "GUIManager.h"
 using namespace std;
 
 class USB_Controller {
 public:
-	USB_Controller();
+	USB_Controller(GUIManager* guiMan);
 	bool init(std::string device_name);
 	~USB_Controller();
 
@@ -26,6 +27,8 @@ public:
 	// send buzz command to arduino
 	void buzz(int timeout);
 private:
+	GUIManager* m_guiMan;
+
 	// member variables
 	int accel_values[3];
 	bool m_switch_on;
