@@ -98,7 +98,7 @@ int main() {
 	srand(time(NULL));
 
 	IrrlichtDevice *device = createDevice(EDT_OPENGL, core::dimension2d<u32>(
-			1280, 800), 16, true, true, false);
+			SCREEN_WIDTH, SCREEN_HEIGTH), 16, false, true, false);
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 	gui::IGUIEnvironment* guienv = device->getGUIEnvironment();

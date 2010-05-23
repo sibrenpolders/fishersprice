@@ -7,6 +7,10 @@
 #include "GUIManager.h"
 using namespace std;
 
+/* baudrate settings are defined in <asm/termbits.h>, which is
+ included by <termios.h> */
+#define BAUDRATE B9600
+
 class USB_Controller {
 public:
 	USB_Controller(GUIManager* guiMan);
