@@ -124,7 +124,6 @@ int USB_Controller::update() {
 		m_guiMan->setText(GUI_ID_RECEIVED_ARDUINO, std::string(buf));
 		parse(buf);
 	}
-	//write(fd, HIGH, strlen(HIGH));
 
 	return res;
 }
@@ -143,7 +142,7 @@ void USB_Controller::parse(char* string) {
 	}
 
 	if (substring_number != 6) {
-		;//cerr << "ERROR: something wrong in serial communication.\n";
+		cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
@@ -168,7 +167,7 @@ void USB_Controller::setValue(int substring_number, char* value) {
 		;
 		break;
 	default:
-		;//cerr << "ERROR: something wrong in serial communication.\n";
+		cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
