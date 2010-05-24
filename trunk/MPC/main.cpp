@@ -22,10 +22,7 @@ using namespace video;
 using namespace std;
 
 #define FILENAME "out.csv"
-#define TIMEOUT_FOR_CALIBRATION 8000
-typedef enum GAME_STAGE {
-	CALIBRATE_BACK = 0, CALIBRATE_FRONT, IN_GAME
-} GAME_STAGE;
+#define TIMEOUT_FOR_CALIBRATION 10000
 
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
@@ -79,6 +76,7 @@ void addUSBControllerValuesToFile(USB_Controller* usbController,
 
 int main() {
 	srand(time(NULL));
+	GAME_STAGE gameStage;
 
 	IrrlichtDevice *pdevice = createDevice(EDT_OPENGL, core::dimension2d<u32>(
 			SCREEN_WIDTH, SCREEN_HEIGTH), 16, true, true, false);
@@ -98,7 +96,8 @@ int main() {
 			vector3df(4350.f, DEFAULT_DEPTH_FISH, 3750.f), 35000);
 	GUIManager guiMan(pdevice);
 	LocationTracker locationTracker;
-	ActionManager actionMan(pcamera, &locationTracker, &cross, &fishMan);
+	ActionManager actionMan(pcamera, &locationTracker, &cross, &fishMan,
+			&gameStage);
 	receiver.setActionManager(&actionMan);
 
 	USB_Controller usbController(&guiMan);
@@ -124,7 +123,7 @@ int main() {
 	int potentioValue;
 	bool pushButtonOn;
 
-	GAME_STAGE stage = CALIBRATE_BACK;
+	gameStage = UNCALIBRATED;
 	printUSBControllerValues(&usbController, &guiMan);
 	resetFile();
 	actionMan.reset();
@@ -141,14 +140,19 @@ int main() {
 				addUSBControllerValuesToFile(&usbController, now);
 			}
 
-			switch (stage) {
+			switch (gameStage) {
+			case UNCALIBRATED:
+				timeout = now + TIMEOUT_FOR_CALIBRATION;
+				guiMan.setText(GUI_ID_GAME_MESSAGE,
+						"Press 'S' when ready for calibrating.\n");
+				break;
 			case CALIBRATE_BACK:
 				guiMan.setText(GUI_ID_GAME_MESSAGE,
 						"Point the top of the rod to the ground behind you.\n");
 
 				if (now > timeout) {
 					timeout = now + TIMEOUT_FOR_CALIBRATION;
-					stage = CALIBRATE_FRONT;
+					gameStage = CALIBRATE_FRONT;
 					if (arduinoInputAvailable)
 						locationTracker.calibrateBack(
 								usbController.get_accelY());
@@ -160,7 +164,7 @@ int main() {
 
 				if (now > timeout) {
 					timeout = now + TIMEOUT_FOR_CALIBRATION;
-					stage = IN_GAME;
+					gameStage = IN_GAME;
 					if (arduinoInputAvailable)
 						locationTracker.calibrateFront(
 								usbController.get_accelY());
@@ -169,6 +173,8 @@ int main() {
 				}
 				break;
 			case IN_GAME:
+				timeout = now + TIMEOUT_FOR_CALIBRATION;
+
 				if (arduinoInputAvailable) {
 					accelY = usbController.get_accelY();
 					switchOn = usbController.switch_on();
@@ -191,8 +197,9 @@ int main() {
 					guiMan.setText(GUI_ID_GAME_MESSAGE,
 							"Yay, the fish has been landed!\nRebegin/reset... .\n");
 				} else if (actionMan.isLandedWithNoFish()) {
-					guiMan.setText(GUI_ID_GAME_MESSAGE,
-							"No more line to bring in.\nRebegin/reset... .\n");
+					guiMan.setText(
+							GUI_ID_GAME_MESSAGE,
+							"No timeout = now + TIMEOUT_FOR_CALIBRATION;more line to bring in.\nRebegin/reset... .\n");
 				} else if (actionMan.throwBlocked()) {
 					guiMan.setText(
 							GUI_ID_GAME_MESSAGE,

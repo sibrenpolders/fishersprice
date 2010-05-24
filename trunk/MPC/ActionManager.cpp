@@ -5,11 +5,13 @@
 using namespace std;
 
 ActionManager::ActionManager(ICameraSceneNode * camera,
-		LocationTracker* locationTracker, Cross* cross, FishManager* fishMan) {
+		LocationTracker* locationTracker, Cross* cross, FishManager* fishMan,
+		GAME_STAGE* gameStage) {
 	m_camera = camera;
 	m_locationTracker = locationTracker;
 	m_cross = cross;
 	m_fishMan = fishMan;
+	m_gameStage = gameStage;
 	reset();
 }
 
@@ -202,6 +204,10 @@ void ActionManager::throwIn() {
 void ActionManager::bringInOneUnit() {
 	m_prevEncoderValue = m_encoderValue;
 	m_encoderValue -= 10;
+}
+
+void ActionManager::startCalibrating() {
+	*(m_gameStage) = CALIBRATE_BACK;
 }
 
 bool ActionManager::checkBuzz(unsigned long now) {
