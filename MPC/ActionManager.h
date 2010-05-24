@@ -11,10 +11,14 @@ using namespace scene;
 using namespace video;
 using namespace std;
 
+typedef enum GAME_STAGE {
+	UNCALIBRATED = 0, CALIBRATE_BACK, CALIBRATE_FRONT, IN_GAME
+} GAME_STAGE;
+
 class ActionManager {
 public:
 	ActionManager(ICameraSceneNode * camera, LocationTracker* locationTracker,
-			Cross* cross, FishManager* fishMan);
+			Cross* cross, FishManager* fishMan, GAME_STAGE* gameStage);
 	virtual ~ActionManager();
 	void reset();
 
@@ -37,6 +41,7 @@ public:
 	void toggleSwitch();
 	void throwIn();
 	void bringInOneUnit();
+	void startCalibrating();
 private:
 	bool m_isHooked;
 	bool m_isBroken;
@@ -61,6 +66,8 @@ private:
 	LocationTracker* m_locationTracker;
 	Cross* m_cross;
 	FishManager* m_fishMan;
+
+	GAME_STAGE* m_gameStage;
 };
 
 #endif /* ACTIONMANAGER_H_ */

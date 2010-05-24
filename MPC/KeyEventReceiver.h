@@ -46,6 +46,9 @@ public:
 			case irr::KEY_KEY_M:
 				m_actionMan->bringInOneUnit();
 				return true;
+			case irr::KEY_KEY_S:
+				m_actionMan->startCalibrating();
+				return true;
 			default:
 				break;
 			}
