@@ -15,8 +15,8 @@ using namespace video;
 using namespace std;
 using namespace gui;
 
-#define SCREEN_WIDTH 1280//1024
-#define SCREEN_HEIGTH 800//768
+#define SCREEN_WIDTH 1024//1280//
+#define SCREEN_HEIGTH 768//800//
 typedef enum GUI_ID {
 	GUI_ID_DIALOG_ROOT_WINDOW = 0x10000,
 	GUI_ID_RECEIVED_ARDUINO,

@@ -70,8 +70,12 @@ void ActionManager::insertArduinoValues(int accelY, bool switchOn,
 		int encoderValue, int potentioValue, bool pushButtonOn) {
 	m_accelY = accelY;
 	m_switchOn = switchOn;
-	m_prevEncoderValue = m_encoderValue;
-	m_encoderValue = encoderValue;
+
+	if (encoderValue < m_encoderValue) {
+		m_prevEncoderValue = m_encoderValue;
+		m_encoderValue = encoderValue;
+	} else
+		m_prevEncoderValue = m_encoderValue;
 	m_potentioValue = potentioValue;
 	m_pushButtonOn = pushButtonOn;
 	m_encoderValuesSetWithArduino = true;
@@ -81,9 +85,9 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 		unsigned long now) {
 	m_fishMan->update(lastFrameDurationMilliSeconds);
 
-	if (m_pushButtonOn)
-		reset();
-	else if (m_isLanded || m_throwBlocked)
+	if (m_pushButtonOn) {
+			reset();
+	} else if (m_isLanded || m_throwBlocked)
 		return;
 	else if (!m_hasThrownSinceReset && !m_isBroken) {
 		m_locationTracker->insertNewValue(m_accelY, now);
@@ -94,11 +98,11 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 			m_hasThrownSinceReset = true;
 			vector3df coords = m_camera->getAbsolutePosition();
 
-			// A throw takes minimum 100ms.
+			// A throw takes minimum 1000ms.
 			unsigned int timeInterval =
 					m_locationTracker->getTimeIntervalOfThrow();
 			float distance = m_locationTracker->getDistanceIntervalOfThrow()
-					* 2500.f * (100.f / timeInterval);
+					* 2500.f * (1000.f / timeInterval);
 			m_cross->setVisible(true);
 			m_cross->setCoords(vector3df(coords.X, 100.f, coords.Z - distance));
 		}
@@ -129,7 +133,7 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 		if (m_prevEncoderValue != m_encoderValue && m_isHooked) {
 			if (abs(m_prevEncoderValue - m_encoderValue) < m_potentioValue
 					/ 100.f || !m_encoderValuesSetWithArduino) {
-				m_cross->bringIn(m_prevEncoderValue - m_encoderValue);
+				m_cross->bringIn(abs(m_prevEncoderValue - m_encoderValue));
 				vector3df pos = m_cross->getCoords();
 				pos.Z -= 50;
 				m_fishMan->setPosition(m_hookedFishID, pos);
@@ -148,7 +152,7 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 
 	} else {
 		if (m_prevEncoderValue != m_encoderValue)
-			m_cross->bringIn(m_prevEncoderValue - m_encoderValue);
+			m_cross->bringIn(abs(m_prevEncoderValue - m_encoderValue));
 
 		vector3df pos = m_cross->getCoords();
 		m_hookedFishID = m_fishMan->checkForHooking(pos);
@@ -211,12 +215,5 @@ void ActionManager::startCalibrating() {
 }
 
 bool ActionManager::checkBuzz(unsigned long now) {
-	if (now >= m_nextBuzz) {
-		if (m_isHooked)
-			m_nextBuzz = now + 200;
-		else
-			m_nextBuzz = now + 2000;
-		return true;
-	} else
-		return false;
+	return m_isHooked;
 }

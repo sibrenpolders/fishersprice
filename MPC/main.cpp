@@ -22,7 +22,7 @@ using namespace video;
 using namespace std;
 
 #define FILENAME "out.csv"
-#define TIMEOUT_FOR_CALIBRATION 10000
+#define TIMEOUT_FOR_CALIBRATION 8000
 
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
@@ -79,7 +79,7 @@ int main() {
 	GAME_STAGE gameStage;
 
 	IrrlichtDevice *pdevice = createDevice(EDT_OPENGL, core::dimension2d<u32>(
-			SCREEN_WIDTH, SCREEN_HEIGTH), 16, true, true, false);
+			SCREEN_WIDTH, SCREEN_HEIGTH), 16, false, true, false);
 	video::IVideoDriver* pdriver = pdevice->getVideoDriver();
 	scene::ISceneManager* psmgr = pdevice->getSceneManager();
 	gui::IGUIEnvironment* pguienv = pdevice->getGUIEnvironment();
@@ -148,7 +148,7 @@ int main() {
 				break;
 			case CALIBRATE_BACK:
 				guiMan.setText(GUI_ID_GAME_MESSAGE,
-						"Point the top of the rod to the ground behind you.\n");
+						"Point the top of the rod behind you.\n");
 
 				if (now > timeout) {
 					timeout = now + TIMEOUT_FOR_CALIBRATION;
@@ -160,7 +160,7 @@ int main() {
 				break;
 			case CALIBRATE_FRONT:
 				guiMan.setText(GUI_ID_GAME_MESSAGE,
-						"Point the top of the rod to the ground in front of you.\n");
+						"Point the top of the rod in front of you.\n");
 
 				if (now > timeout) {
 					timeout = now + TIMEOUT_FOR_CALIBRATION;
@@ -197,9 +197,8 @@ int main() {
 					guiMan.setText(GUI_ID_GAME_MESSAGE,
 							"Yay, the fish has been landed!\nRebegin/reset... .\n");
 				} else if (actionMan.isLandedWithNoFish()) {
-					guiMan.setText(
-							GUI_ID_GAME_MESSAGE,
-							"No timeout = now + TIMEOUT_FOR_CALIBRATION;more line to bring in.\nRebegin/reset... .\n");
+					guiMan.setText(GUI_ID_GAME_MESSAGE,
+							"No more line to bring in.\nRebegin/reset... .\n");
 				} else if (actionMan.throwBlocked()) {
 					guiMan.setText(
 							GUI_ID_GAME_MESSAGE,
@@ -208,7 +207,9 @@ int main() {
 					guiMan.setText(GUI_ID_GAME_MESSAGE, "Happy fishing! :)\n");
 
 				if (actionMan.checkBuzz(now) && arduinoInputAvailable)
-					usbController.buzz(100);
+					usbController.buzz();
+				else if (arduinoInputAvailable)
+					usbController.nobuzz();
 				break;
 			default:
 				cerr << "Unknown game stage.\n";

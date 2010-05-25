@@ -20,7 +20,8 @@ const int USB_Controller::ROTATION = 2;
 const int USB_Controller::POTENTIO_METER = 3;
 const int USB_Controller::ACCEL = 4;
 const int USB_Controller::SOURCE = 5;
-const char* USB_Controller::BUZZ = "SH\r";
+const char* USB_Controller::BUZZ = "C";
+const char* USB_Controller::NOBUZZ = "N";
 
 USB_Controller::USB_Controller(GUIManager* guiMan) {
 	m_guiMan = guiMan;
@@ -35,69 +36,41 @@ USB_Controller::USB_Controller(GUIManager* guiMan) {
 
 bool USB_Controller::init(std::string device_name) {
 	fd = open(device_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-	if (fd < 0) {
-		perror(device_name.c_str());
+	if (fd == -1) {
+		perror("init_serialport: Unable to open port ");
+		return -1;
+	}
+
+	if (tcgetattr(fd, &toptions) < 0) {
+		perror("init_serialport: Couldn't get term attributes");
+		return -1;
+	}
+
+	cfsetispeed(&toptions, BAUDRATE);
+	cfsetospeed(&toptions, BAUDRATE);
+
+	// 8N1
+	toptions.c_cflag &= ~PARENB;
+	toptions.c_cflag &= ~CSTOPB;
+	toptions.c_cflag &= ~CSIZE;
+	toptions.c_cflag |= CS8;
+	// no flow control
+	toptions.c_cflag &= ~CRTSCTS;
+
+	toptions.c_cflag |= CREAD | CLOCAL; // turn on READ & ignore ctrl lines
+	toptions.c_iflag &= ~(IXON | IXOFF | IXANY); // turn off s/w flow ctrl
+
+	toptions.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // make raw
+	toptions.c_oflag &= ~OPOST; // make raw
+
+	// see: http://unixwiz.net/techtips/termios-vmin-vtime.html
+	toptions.c_cc[VMIN] = 0;
+	toptions.c_cc[VTIME] = 20;
+
+	if (tcsetattr(fd, TCSANOW, &toptions) < 0) {
+		perror("init_serialport: Couldn't set term attributes");
 		return false;
 	}
-	tcgetattr(fd, &oldtio); /* save current serial port settings */
-	bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
-
-	/*
-	 BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
-	 CRTSCTS : output hardware flow control (only used if the cable has
-	 all necessary lines. See sect. 7 of Serial-HOWTO)
-	 CS8     : 8n1 (8bit,no parity,1 stopbit)
-	 CLOCAL  : local connection, no modem contol
-	 CREAD   : enable receiving characters
-	 */
-	newtio.c_cflag = BAUDRATE | CRTSCTS | CS8 | CLOCAL | CREAD;
-
-	/*
-	 IGNPAR  : ignore bytes with parity errors
-	 ICRNL   : map CR to NL (otherwise a CR input on the other computer
-	 will not terminate input)
-	 otherwise make device raw (no other input processing)
-	 */
-	newtio.c_iflag = IGNPAR | ICRNL;
-	/*
-	 Raw output.
-	 */
-	newtio.c_oflag = 1;
-
-	/*
-	 ICANON  : enable canonical input
-	 disable all echo functionality, and don't send signals to calling program
-	 */
-	newtio.c_lflag = ICANON;
-
-	/*
-	 initialize all control characters
-	 default values can be found in /usr/include/termios.h, and are given
-	 in the comments, but we don't need them here
-	 */
-	newtio.c_cc[VINTR] = 0; /* Ctrl-c */
-	newtio.c_cc[VQUIT] = 0; /* Ctrl-\ */
-	newtio.c_cc[VERASE] = 0; /* del */
-	newtio.c_cc[VKILL] = 0; /* @ */
-	newtio.c_cc[VEOF] = 4; /* Ctrl-d */
-	newtio.c_cc[VTIME] = 0; /* inter-character timer unused */
-	newtio.c_cc[VMIN] = 1; /* blocking read until 1 character arrives */
-	newtio.c_cc[VSWTC] = 0; /* '\0' */
-	newtio.c_cc[VSTART] = 0; /* Ctrl-q */
-	newtio.c_cc[VSTOP] = 0; /* Ctrl-s */
-	newtio.c_cc[VSUSP] = 0; /* Ctrl-z */
-	newtio.c_cc[VEOL] = 0; /* '\0' */
-	newtio.c_cc[VREPRINT] = 0; /* Ctrl-r */
-	newtio.c_cc[VDISCARD] = 0; /* Ctrl-u */
-	newtio.c_cc[VWERASE] = 0; /* Ctrl-w */
-	newtio.c_cc[VLNEXT] = 0; /* Ctrl-v */
-	newtio.c_cc[VEOL2] = 0; /* '\0' */
-
-	/*
-	 now clean the modem line and activate the settings for the port
-	 */
-	tcflush(fd, TCIFLUSH);
-	tcsetattr(fd, TCSANOW, &newtio);
 
 	return true;
 }
@@ -113,7 +86,8 @@ int USB_Controller::update() {
 	 subsequent reads will return the remaining chars. res will be set
 	 to the actual number of characters actually read */
 	char buf[255];
-	int res = read(fd, buf, 255);
+	serialport_read_until(fd, buf, '\n');
+	int res = strlen(buf);
 	buf[res] = '\0'; /* set end of string, so we can printf */
 	if (res > 8) {
 		m_guiMan->setText(GUI_ID_RECEIVED_ARDUINO, std::string(buf));
@@ -137,7 +111,7 @@ void USB_Controller::parse(char* string) {
 	}
 
 	if (substring_number != 6) {
-		cerr << "ERROR: something wrong in serial communication.\n";
+		;//cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
@@ -162,7 +136,7 @@ void USB_Controller::setValue(int substring_number, char* value) {
 		;
 		break;
 	default:
-		cerr << "ERROR: something wrong in serial communication.\n";
+		;//cerr << "ERROR: something wrong in serial communication.\n";
 	}
 }
 
@@ -189,8 +163,7 @@ void USB_Controller::set_switch_on(char* value) {
 		m_switch_on = true;
 		break;
 	default:
-		cerr << "Error wrong sensor values given: Sensor = switch, Value = "
-				<< value << ".\n";
+		;//cerr << "Error wrong sensor values given: Sensor = switch, Value = "	<< value << ".\n";
 	}
 }
 
@@ -225,11 +198,11 @@ int USB_Controller::get_potentiometer_value(void) {
 }
 
 void USB_Controller::buzz() {
-	cout << "Sending: " << BUZZ << endl;
-	//write(fd, (char*) BUZZ, strlen(BUZZ));
-	//tcdrain(fd);
+	serialport_write(fd, "C");
+}
 
-	system("./Debug/buzz -p /dev/ttyUSB0 -b 9600 -s SH");
+void USB_Controller::nobuzz() {
+	serialport_write(fd, "N");
 }
 
 bool USB_Controller::push_on(void) {
@@ -245,7 +218,34 @@ void USB_Controller::set_push_on(char* value) {
 		push = true;
 		break;
 	default:
-		cerr << "Error wrong sensor values given: Sensor = push, Value = "
-				<< value << ".\n";
+		;//cerr << "Error wrong sensor values given: Sensor = push, Value = " << value << ".\n";
 	}
+}
+
+int USB_Controller::serialport_read_until(int fd, char* buf, char until) {
+	char b[1];
+	int i = 0;
+	do {
+		int n = read(fd, b, 1); // read a char at a time
+		if (n == -1)
+			return -1; // couldn't read
+		if (n == 0) {
+			usleep(10 * 1000); // wait 10 msec try again
+			continue;
+		}
+		buf[i] = b[0];
+		i++;
+	} while (b[0] != until);
+
+	buf[i] = 0; // null terminate the string
+	return 0;
+}
+
+int USB_Controller::serialport_write(int fd, const char* str) {
+	int len = strlen(str);
+	int n = write(fd, str, len);
+
+	if (n != len)
+		return -1;
+	return 0;
 }

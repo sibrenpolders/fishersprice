@@ -30,6 +30,7 @@ public:
 
 	// send buzz command to arduino
 	void buzz();
+	void nobuzz();
 private:
 	GUIManager* m_guiMan;
 
@@ -40,7 +41,7 @@ private:
 	int potentiometer_value;
 	int fd;
 	bool push;
-	struct termios oldtio, newtio;
+	struct termios oldtio, toptions;
 
 	// member consts
 
@@ -53,6 +54,7 @@ private:
 	const static int PUSH;
 	const static int SOURCE;
 	const static char* BUZZ;
+	const static char* NOBUZZ;
 
 	// member functions
 
@@ -66,5 +68,8 @@ private:
 	void set_rotation_value(char* value);
 	void set_potentiometer_value(char* value);
 	void set_push_on(char* value);
+
+	int serialport_write(int fd, const char* str);
+	int serialport_read_until(int fd, char* buf, char until);
 };
 #endif // __USB_CONTROLLER_H__
