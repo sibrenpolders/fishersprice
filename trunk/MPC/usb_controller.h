@@ -29,7 +29,7 @@ public:
 	bool push_on(void);
 
 	// send buzz command to arduino
-	void buzz(int timeout);
+	void buzz();
 private:
 	GUIManager* m_guiMan;
 
@@ -52,8 +52,7 @@ private:
 	const static int POTENTIO_METER;
 	const static int PUSH;
 	const static int SOURCE;
-	const static char* HIGH;
-	const static char* LOW;
+	const static char* BUZZ;
 
 	// member functions
 

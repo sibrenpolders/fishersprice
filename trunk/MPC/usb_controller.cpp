@@ -20,8 +20,7 @@ const int USB_Controller::ROTATION = 2;
 const int USB_Controller::POTENTIO_METER = 3;
 const int USB_Controller::ACCEL = 4;
 const int USB_Controller::SOURCE = 5;
-const char* USB_Controller::HIGH = "SH";
-const char* USB_Controller::LOW = "SL";
+const char* USB_Controller::BUZZ = "SH\r";
 
 USB_Controller::USB_Controller(GUIManager* guiMan) {
 	m_guiMan = guiMan;
@@ -35,7 +34,7 @@ USB_Controller::USB_Controller(GUIManager* guiMan) {
 }
 
 bool USB_Controller::init(std::string device_name) {
-	fd = open(device_name.c_str(), O_RDWR | O_NOCTTY);
+	fd = open(device_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd < 0) {
 		perror(device_name.c_str());
 		return false;
@@ -63,7 +62,7 @@ bool USB_Controller::init(std::string device_name) {
 	/*
 	 Raw output.
 	 */
-	newtio.c_oflag = 0;
+	newtio.c_oflag = 1;
 
 	/*
 	 ICANON  : enable canonical input
@@ -225,9 +224,12 @@ int USB_Controller::get_potentiometer_value(void) {
 	return potentiometer_value;
 }
 
-void USB_Controller::buzz(int timeout) {
-	cout << "Sending: " << HIGH << endl;
-	write(fd, HIGH, strlen(HIGH));
+void USB_Controller::buzz() {
+	cout << "Sending: " << BUZZ << endl;
+	//write(fd, (char*) BUZZ, strlen(BUZZ));
+	//tcdrain(fd);
+
+	system("./Debug/buzz -p /dev/ttyUSB0 -b 9600 -s SH");
 }
 
 bool USB_Controller::push_on(void) {
