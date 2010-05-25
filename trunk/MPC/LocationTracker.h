@@ -1,6 +1,9 @@
 #ifndef LOCATIONTRACKER_H_
 #define LOCATIONTRACKER_H_
 
+#include <vector>
+using namespace std;
+
 class LocationTracker {
 public:
 	LocationTracker();
@@ -20,16 +23,20 @@ private:
 	int m_front;
 	int m_back;
 
-	bool m_newThrowReady; // set back on false when pos is read out
+	bool m_newThrowReady;
+	bool m_newThrowReady_query;
+	bool m_backwardsReady;
+
 	int m_prevLastStableValue;
 	int m_lastStableValue;
-	int m_lastInsertedValue;
-	bool m_lastStableWasEndOfThrow;
-	bool m_lastInsertedWasStable;
 	unsigned int m_timestampPrevLastStableValue;
 	unsigned int m_timestampLastStableValue;
+	vector<int> m_cachedValues;
 
 	const static int thresholdValue = 15;
+	const static int nbStableValuesBeforeStable = 10;
+
+	int getAverageCachedValue();
 };
 
 #endif /* LOCATIONTRACKER_H_ */
