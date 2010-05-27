@@ -15,7 +15,8 @@ int PIN_ACCEL_Z = 5;
 int encoderPinALast = LOW;
 int encoderRead = LOW;
 int loopNr = 0;
- 
+int loopNr2 = 0;
+
 int switch_on;
 int push_on;
 int buzz_triggered;
@@ -96,15 +97,8 @@ void setup() {
  }
 
  void receiveSerial() {
-   if (Serial.available() > 0) {
-     Serial.println("SUCCES");
+   if (Serial.available() > 0) {     
     incomingByte = Serial.read();
-    if (incomingByte == 'S') {
-      incomingByte = Serial.read();
-      if (incomingByte == 'H') {
-        writeBuzzer();
-      }
-    }
   }
  }
  
@@ -114,11 +108,21 @@ void setup() {
   readSwitch();
   readPotentio();
   readAccelero();
-        
+  receiveSerial();
+  
+  if (incomingByte == 'C' && loopNr2 % 1000 == 0) {
+    writeBuzzer();
+  } else if (loopNr2 == 10000){
+    writeBuzzer();
+    loopNr2 = 0;    
+  }
+  loopNr2++;
   loopNr++;
   if(loopNr > 100){
     sendSerial();
-    receiveSerial();
+    
     loopNr = 0;
   }
- } 
+ }
+
+
