@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include "LocationTracker.h"
 #include <math.h>
 #include <cmath>

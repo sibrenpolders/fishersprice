@@ -1,3 +1,5 @@
+// author: Sibren Polders
+
 #ifndef __USB_CONTROLLER_H__
 #define __USB_CONTROLLER_H__
 

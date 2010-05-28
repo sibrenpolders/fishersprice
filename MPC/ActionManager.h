@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef ACTIONMANAGER_H_
 #define ACTIONMANAGER_H_
 
