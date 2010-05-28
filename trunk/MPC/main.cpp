@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include <irrlicht.h>
 #include <iostream>
 #include <fstream>

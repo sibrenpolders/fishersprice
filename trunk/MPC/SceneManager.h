@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef SCENEMANAGER_H_
 #define SCENEMANAGER_H_
 

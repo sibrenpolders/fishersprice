@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include "ActionManager.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,7 +73,7 @@ void ActionManager::insertArduinoValues(int accelY, bool switchOn,
 	m_accelY = accelY;
 	m_switchOn = switchOn;
 
-	if (encoderValue < m_encoderValue) {
+	if (encoderValue > m_encoderValue) {
 		m_prevEncoderValue = m_encoderValue;
 		m_encoderValue = encoderValue;
 	} else
@@ -86,7 +88,7 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 	m_fishMan->update(lastFrameDurationMilliSeconds);
 
 	if (m_pushButtonOn) {
-			reset();
+		reset();
 	} else if (m_isLanded || m_throwBlocked)
 		return;
 	else if (!m_hasThrownSinceReset && !m_isBroken) {
@@ -130,9 +132,9 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 				m_cross->setVisible(true);
 			}
 		}
-		if (m_prevEncoderValue != m_encoderValue && m_isHooked) {
+		if (m_prevEncoderValue != m_encoderValue && m_switchOn && m_isHooked) {
 			if (abs(m_prevEncoderValue - m_encoderValue) < m_potentioValue
-					/ 100.f || !m_encoderValuesSetWithArduino) {
+					/ 50.f || !m_encoderValuesSetWithArduino) {
 				m_cross->bringIn(abs(m_prevEncoderValue - m_encoderValue));
 				vector3df pos = m_cross->getCoords();
 				pos.Z -= 50;
@@ -151,7 +153,7 @@ void ActionManager::update(unsigned int lastFrameDurationMilliSeconds,
 		}
 
 	} else {
-		if (m_prevEncoderValue != m_encoderValue)
+		if (m_prevEncoderValue != m_encoderValue && m_switchOn)
 			m_cross->bringIn(abs(m_prevEncoderValue - m_encoderValue));
 
 		vector3df pos = m_cross->getCoords();
@@ -215,5 +217,5 @@ void ActionManager::startCalibrating() {
 }
 
 bool ActionManager::checkBuzz(unsigned long now) {
-	return m_isHooked;
+	return m_isHooked && !m_isLanded;
 }

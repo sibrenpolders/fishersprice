@@ -1,3 +1,5 @@
+// author: Sibren Polders
+
 #include "usb_controller.h"
 #include <sys/types.h>
 #include <sys/time.h>

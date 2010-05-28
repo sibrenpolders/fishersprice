@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include "Cross.h"
 #include <irrlicht.h>
 #include <iostream>

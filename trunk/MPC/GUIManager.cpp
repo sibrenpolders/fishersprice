@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include "GUIManager.h"
 
 GUIManager::GUIManager(IrrlichtDevice *device) {

@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef GUIMANAGER_H_
 #define GUIMANAGER_H_
 

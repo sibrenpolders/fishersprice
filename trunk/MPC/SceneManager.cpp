@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include "SceneManager.h"
 
 SceneManager::SceneManager(IrrlichtDevice *device, IVideoDriver* driver,

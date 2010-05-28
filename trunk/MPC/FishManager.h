@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef FISHMANAGER_H_
 #define FISHMANAGER_H_
 

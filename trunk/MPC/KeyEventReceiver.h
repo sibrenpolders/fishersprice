@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef KEYEVENTRECEIVER_H_
 #define KEYEVENTRECEIVER_H_
 

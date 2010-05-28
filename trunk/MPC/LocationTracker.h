@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef LOCATIONTRACKER_H_
 #define LOCATIONTRACKER_H_
 

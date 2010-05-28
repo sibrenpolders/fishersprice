@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #ifndef CROSS_H_
 #define CROSS_H_
 

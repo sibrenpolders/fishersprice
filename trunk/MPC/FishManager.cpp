@@ -1,3 +1,5 @@
+// author: Sibrand Staessens
+
 #include "FishManager.h"
 #include <iostream>
 using namespace std;

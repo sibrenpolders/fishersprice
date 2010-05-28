@@ -1,3 +1,5 @@
+//	author: Sibren Polders
+
 // digital pins
 int PIN_SWITCH = 7;
 int PIN_PUSHBUTTON = 9;
@@ -74,10 +76,6 @@ void setup() {
  
  void writeBuzzer(){
   tone(PIN_BUZZER, 500, 500);   
-  /*PIN_BUZZER = HIGH;
-  delay(100);
-  PIN_BUZZER = LOW;
-  */
  }
  
  void sendSerial(){
@@ -119,10 +117,7 @@ void setup() {
   loopNr2++;
   loopNr++;
   if(loopNr > 100){
-    sendSerial();
-    
+    sendSerial();    
     loopNr = 0;
   }
  }
-
-
